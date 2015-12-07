@@ -1,121 +1,97 @@
 
-my_cols <- function(){
-  c(b_blue="#6baed6", 
-    b_grey="#969696", 
-    b_purple="#9e9ac8", 
-    b_green="#74c476", 
-    b_pink="#e377c2", 
-    b_orange="#FD8D3C",
-    b_darkgrey="#2D2D2D"
-  )
+my_cols <- function() {
+  c(b_blue = "#6baed6", b_grey = "#969696", b_purple = "#9e9ac8", b_green = "#74c476",
+    b_pink = "#e377c2", b_orange = "#FD8D3C", b_darkgrey = "#2D2D2D", b_white = "navajowhite4")
 }
 
 baad_variable_count <- function(baad) {
 
-  par(oma=c(0,0,0,0), mar = c(4,13, 0.0,1.5))
+  par(oma = c(0, 0, 0, 0), mar = c(4, 13, 0, 1.5))
   cols <- my_cols()
 
-  data <- baad[["data"]][, sapply(baad[["data"]], is.numeric) & 
-                !names(baad[["data"]]) %in% 
-                c( "latitude", "longitude", "map", "mat", "lai")]
+  data <- baad[["data"]][, sapply(baad[["data"]], is.numeric) & !names(baad[["data"]]) %in%
+    c("latitude", "longitude", "map", "mat", "lai")]
 
   records <- sort(sapply(data, function(x) sum(!is.na(x))))
   records <- records[records > 500]
   lab <- baad$dictionary$label[match(names(records), baad$dictionary$variable)]
 
-  barplot(records, horiz=TRUE,
-    las=1, names.arg= lab, cex = 1, cex.names =1, 
-    col=cols["b_orange"], border =NA, xlim=c(0,2E4))
-  mtext("Number of records", 1, line=3, cex=1.0)
+  barplot(records, horiz = TRUE, las = 1, names.arg = lab, cex = 1, cex.names = 1,
+    col = cols["b_orange"], border = NA, xlim = c(0, 20000))
+  mtext("Number of records", 1, line = 3, cex = 1)
 }
 
-allometry_LH <- function(baad){
+allometry_LH <- function(baad) {
 
   cols <- my_cols()
 
   data <- baad[["data"]]
-  data <- subset(data, !is.na(data[["a.lf"]]*data[["h.t"]]))
+  data <- subset(data, !is.na(data[["a.lf"]] * data[["h.t"]]))
 
   # remove species with < 3 data points
   n <- table(data$species)
-  data <- subset(data, !data[["species"]] %in% names(n)[n<4])
+  data <- subset(data, !data[["species"]] %in% names(n)[n < 4])
 
-  par(mar=c(5,5,1,1))
+  par(mar = c(5, 5, 1, 1))
 
   A <- data[["a.lf"]]
   H <- data[["h.t"]]
   G <- data[["species"]]
 
-  ax <- seq(-5, 4, by=2)
+  ax <- seq(-5, 4, by = 2)
   lab <- do.call(expression, lapply(ax, function(i) bquote(10^.(i))))
 
   smfit <- sma(H ~ A * G, log = "xy")
 
-  blank_plot(xlim = c(1E-5, 5E3), ylim=c(0.001, 200), log = "xy")
+  blank_plot(xlim = c(1e-05, 5000), ylim = c(0.001, 200), log = "xy")
   axis(1, at = 10^ax, labels = lab, las = 1, cex.axis = 0.8)
   axis(2, at = 10^ax, labels = lab, las = 1, cex.axis = 0.8)
 
-  plot(smfit, add = TRUE, col = cols["b_grey"], pch = 19, lwd = 0,
-  cex = 1, type = "p")
-  plot(smfit, add = TRUE, col =cols["b_green"], lwd = 1, type = "l", p.lines.transparent =0.15)
+  plot(smfit, add = TRUE, col = cols["b_grey"], pch = 19, lwd = 0, cex = 1, type = "p")
+  plot(smfit, add = TRUE, col = cols["b_green"], lwd = 1, type = "l", p.lines.transparent = 0.15)
   species <- G[!is.na(H * A)]
-  mtext("Individual's height (m)", 2, line=3)
-  mtext(expression("Individual's leaf area"~~(m^2)), 1, line=3)
-  legend("topleft", legend = paste(length(species), " individuals\n", length(unique(species)), " species"), bty = "n", cex = 0.5)
- }
+  mtext("Individual's height (m)", 2, line = 3)
+  mtext(expression("Individual's leaf area" ~ ~(m^2)), 1, line = 3)
+  legend("topleft", legend = paste(length(species), " individuals\n", length(unique(species)),
+    " species"), bty = "n", cex = 0.5)
+}
 
-figure_map <- function(baad){
+figure_map <- function(baad) {
   data <- baad$data
 
-  cols <- make_transparent(c(my_cols(),"navajowhite4"),0.67)
-  vegs <- c("BorF","Sav","TempF","TempRF","TropRF","TropSF","Wo")
-  vegs_labels <- c("Boreal forest","Savannah","Temperate forest",
-                   "Temperate rainforest","Tropical rainforest",
-                   "Tropical seasonal forest","Woodland","Glasshouse, Common garden")
+  cols <- make_transparent(my_cols(), 0.67)
+  vegs <- c("BorF", "Sav", "TempF", "TempRF", "TropRF", "TropSF", "Wo")
+  vegs_labels <- c("Boreal forest", "Savannah", "Temperate forest", "Temperate rainforest",
+    "Tropical rainforest", "Tropical seasonal forest", "Woodland", "Glasshouse, Common garden")
 
-  drawWorldPlot(data[data$vegetation == vegs[1],], sizebyn=TRUE, pchcol=cols[1])
-  for(i in 2:length(vegs)){
-    drawWorldPlot(data[data$vegetation == vegs[i],], sizebyn=TRUE, pchcol=cols[i], add=TRUE)
-  }
-  drawWorldPlot(data[data$growingCondition == "GH",], sizebyn=TRUE,
-                pchcol=cols[8], add=TRUE)
-  par(xpd=NA)
-  legend(-190, 40, vegs_labels[1:8], fill=cols[1:8], bty='n', cex=0.8)
-  ns <- c(10,100,1000)
-  X <- rep(-180,3)
-  Y <- seq(-70,-50,by=10)
-  symbols(x=X, y=Y, circles=log10(ns), inches=0.1,
-          fg="black", bg=my_cols()[1], add=TRUE)
-  text(x=X+5, y=Y, labels=as.character(ns),pos=4)
-  text(x=X, y=Y[3]+10, labels="plants", pos=4)
+  map("world", col = "grey80", bg = "white", lwd = 0.5, fill = TRUE, resolution = 0,
+    wrap = FALSE, border = "grey80", ylim = c(-90, 90), mar = c(0,0,0,0))
+  map("world", col = "black", boundary = TRUE, lwd = 0.2, interior = FALSE,
+    fill = FALSE, add = TRUE, resolution = 0, wrap = TRUE)
 
-}
-
-drawWorldPlot <- function(data, sizebyn=FALSE, add=FALSE,
-                          pchcol="red", legend=TRUE) {
-  if (!add){
-    map('world',col="grey80",bg="white",lwd=0.5,fill=TRUE,resolution=0,wrap=FALSE, border="grey80", ylim=c(-90, 90), mar=c(0,0,0,0))
-    map('world',col="black",boundary=TRUE,lwd=0.2,interior=FALSE,fill=FALSE,add=TRUE,resolution=0,wrap=TRUE)
-  }
-
-  # Remove all duplicates (increases speed and minimizes file size)
-  latlon <- with(data, paste(latitude, longitude))
-  lat <- data$latitude[!duplicated(latlon)]
-  lon <- data$longitude[!duplicated(latlon)]
-
-  j  <-  !is.na(lat) & !is.na(lon)
-
-  if(!any(j)){
-    polygon(c(-100,95,95,-100), c(-10,-10,15,15), col=rgb(0,0,0,240,maxColorValue=255))
-    text(-100, 0, expression(paste(bold("Missing coordinate/location"))), col="red", xpd=TRUE, pos=4, cex=0.8)
-  } else {
-
-    if(!sizebyn){
-      points(lon,lat, pch=19, col=pchcol, cex=0.6)
+  for (i in seq_len(length(vegs))) {
+    if(i < 8) {
+      data_i <- subset(data, data$vegetation == vegs[i])
     } else {
-      n <- table(latlon)
-      symbols(lon,lat, circles=log10(n), inches=0.1, fg="black", bg=pchcol, add=TRUE)
+      data_i <- subset(data, data$growingCondition == "GH")
     }
-  }
+    latlon <- with(data_i, paste(latitude, longitude))
+    lat <- data_i$latitude[!duplicated(latlon)]
+    lon <- data_i$longitude[!duplicated(latlon)]
+
+    n <- table(latlon)
+    symbols(lon, lat, circles = log10(n), inches = 0.1, fg = "black", bg = cols[i],
+      add = TRUE)
+ }
+
+  # Add legend
+  par(xpd = NA)
+  legend(-190, 40, vegs_labels[1:8], fill = cols[1:8], bty = "n", cex = 0.8)
+  ns <- c(10, 100, 1000)
+  X <- rep(-180, 3)
+  Y <- seq(-70, -50, by = 10)
+  symbols(x = X, y = Y, circles = log10(ns), inches = 0.1, fg = "black", bg = my_cols()[1],
+    add = TRUE)
+  text(x = X + 5, y = Y, labels = as.character(ns), pos = 4)
+  text(x = X, y = Y[3] + 10, labels = "plants", pos = 4)
 }
- 

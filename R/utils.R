@@ -1,5 +1,5 @@
 
-# sets up an empty plotting window
+## Sets up an empty plotting window
 blank_plot <- function(xlim = c(0.02, 1.3), ylim = c(0.04, 15), use.box = TRUE,
   ...) {
   plot.new()
@@ -10,7 +10,7 @@ blank_plot <- function(xlim = c(0.02, 1.3), ylim = c(0.04, 15), use.box = TRUE,
 }
 
 ## Make colours semitransparent:
-make_transparent <- function(col, opacity=0.5) {
+make_transparent <- function(col, opacity = 0.5) {
   if (length(opacity) > 1 && any(is.na(opacity))) {
     n <- max(length(col), length(opacity))
     opacity <- rep(opacity, length.out = n)
