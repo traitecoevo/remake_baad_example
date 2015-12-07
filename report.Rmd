@@ -42,4 +42,4 @@ figure_allometry_LH(baad)
 
 **Figure 3** Plot of leaf area vs height in BAAD.
 
-For more info on the BAAD see the paper in [Ecology]() or the [github repo](https://github.com/dfalster/baad).
+For more info on the BAAD see the paper in [Ecology](http://doi.org/10.1890/14-1889.1) or the [github repo](https://github.com/dfalster/baad).
