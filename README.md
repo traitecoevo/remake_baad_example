@@ -10,8 +10,14 @@ Download this repo, then open a new R session with this project set as working d
 remake::install_missing_packages()
 ```
 
-Then, to generate the figures in the paper, run
+Then, to generate the figures and tables, run
 
 ```r
-remake::make("figures")
+remake::make("")
+```
+
+To generate the knitr report, run
+
+```r
+remake::make("report.docx")
 ```

@@ -22,6 +22,7 @@ targets:
   all:
     depends:
       - figures
+      - tables
 
   figures:
     depends:
@@ -46,10 +47,29 @@ targets:
     plot: 9by4
 
   figures/baad_variable_count.pdf:
-    command: baad_variable_count(baad)
+    command: figure_variable_count(baad)
     plot: square6
 
   figures/baad_leaf_height.pdf:
-    command: allometry_LH(baad)
+    command: figure_allometry_LH(baad)
     plot: square3
 
+  tables:
+    depends:
+      - tables/summary.csv
+
+  summary:
+    command: table_summary(baad)
+
+  tables/summary.csv:
+    command: write.csv(summary, target_name, row.names=FALSE)
+
+  report.md:
+    packages: knitr
+    knitr: TRUE
+    depends:
+      - baad
+
+  report.docx:
+    packages: rmarkdown
+    command: render("report.md", I("word_document"), quiet=TRUE)

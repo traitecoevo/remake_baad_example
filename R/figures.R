@@ -15,7 +15,7 @@ my_cols <- function() {
     b_pink = "#e377c2", b_orange = "#FD8D3C", b_darkgrey = "#2D2D2D", b_white = "navajowhite4")
 }
 
-baad_variable_count <- function(baad) {
+figure_variable_count <- function(baad) {
 
   par(oma = c(0, 0, 0, 0), mar = c(4, 13, 0, 1.5))
   cols <- my_cols()
@@ -32,7 +32,7 @@ baad_variable_count <- function(baad) {
   mtext("Number of records", 1, line = 3, cex = 1)
 }
 
-allometry_LH <- function(baad) {
+figure_allometry_LH <- function(baad) {
 
   cols <- my_cols()
 
@@ -105,4 +105,43 @@ figure_map <- function(baad) {
     add = TRUE)
   text(x = X + 5, y = Y, labels = as.character(ns), pos = 4)
   text(x = X, y = Y[3] + 10, labels = "plants", pos = 4)
+}
+
+table_summary <- function(baad) {
+  digits <- 2
+  data <- baad[["data"]]
+  var_def <- baad[["dictionary"]]
+
+  thesevars <- setdiff(var_def$variable[var_def$type == "numeric"],
+                       c("map", "mat", "lai"))
+
+  N <- colSums(!is.na(data[thesevars]))
+  thesevars <- thesevars[N > 0]
+  N <- N[N > 0]
+
+  Nstud <- sapply(data[thesevars], function(x)
+                  length(unique(data$studyName[!is.na(x)])))
+
+  df <- rbind.fill(apply(data[thesevars], 2, function(x)
+                         data.frame(Min=min(x, na.rm=TRUE),
+                                    Max=max(x, na.rm=TRUE),
+                                    Median=median(x, na.rm=TRUE))))
+
+  dfr <- data.frame(Variable=thesevars, N=N, Studies=Nstud)
+  dfr <- cbind(dfr, df)
+
+  for (v in c("Min", "Max", "Median")) {
+    dfr[[v]] <- formatC(dfr[[v]], digits=digits, format="fg")
+  }
+
+  i <- match(thesevars, var_def$variable)
+  dfr$Units    <- var_def$units[i]
+  dfr$Variable <- var_def$variable[i]
+  dfr$Label    <- var_def$label[i]
+
+  dfr <- dfr[c("Variable", "Label", "Units", "N", "Studies",
+               "Min", "Median", "Max")]
+  rownames(dfr) <- NULL
+
+  dfr
 }

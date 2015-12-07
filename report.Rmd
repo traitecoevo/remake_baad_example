@@ -1,0 +1,45 @@
+# A quick look at BAAD
+
+```{r, results="hide", echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(tidy=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.cap="")
+
+data <- baad$data
+var_def <- baad$dictionary
+vars <- setdiff(var_def$variable[var_def$type == "numeric"],
+                c("map", "mat", "lai", "age"))
+```
+The Biomass And Allometry Database for woody plants (BAAD) contains `r sum(!is.na(data[,vars]))` measurements collected in `r length(unique(data$studyName))` different studies, from `r nrow(data)` individuals across `r length(unique(data$species))` species.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=7}
+figure_map(baad)
+```
+
+**Figure 1** Global distribution of studies included in the BAAD. Symbols are sized relative to the number of individual plants in each dataset.
+
+## Variables
+
+**Number of observations by variable**
+
+```{r results='asis', echo=FALSE, warning=FALSE}
+
+kable(table_summary(baad), "markdown", align="l", padding=10)
+```
+
+## Some plots
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=7}
+figure_variable_count(baad)
+```
+
+**Figure 2** Plot of most commonly recorded variables in BAAD.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=7}
+figure_allometry_LH(baad)
+```
+
+**Figure 3** Plot of leaf area vs height in BAAD.
+
+For more info on the BAAD see the paper in [Ecology]() or the [github repo](https://github.com/dfalster/baad).
