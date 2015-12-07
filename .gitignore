@@ -1,3 +1,7 @@
 downloads
-figures
+figure*
+tables*
 .remake
+*.html
+*.docx
+report.md
