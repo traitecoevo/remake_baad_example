@@ -1,3 +1,10 @@
+download_baad <- function(destination_filename) {
+  url <-
+    "https://github.com/dfalster/baad/releases/download/v1.0.0/baad.rds"
+  download(url, destination_filename, mode="wb")
+  # download function from package downloader provides wrapper
+  # to download file so that works for https and across platforms
+}
 
 my_cols <- function() {
   c(b_blue = "#6baed6", b_grey = "#969696", b_purple = "#9e9ac8", b_green = "#74c476",
