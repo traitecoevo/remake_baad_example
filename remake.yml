@@ -1,0 +1,71 @@
+packages:
+  - smatr
+  - maps
+  - mapdata
+
+sources:
+  - R
+
+plot_options:
+  square3:
+    width: 3
+    height: 3
+  square6:
+    width: 6
+    height: 6
+  9by4:
+    width: 9
+    height: 4
+
+targets:
+  all:
+    depends:
+      - figures
+
+  figures:
+    depends:
+      - downloads/BTFF15.jpg
+      - downloads/michael.png
+      - figures/map.pdf
+      - figures/baad_variable_count.pdf
+      - figures/tradeoff-Falster2015-1.pdf
+      - figures/tradeoff-Falster2015-2.pdf
+      - figures/tradeoff-Falster2015-3.pdf
+  
+  downloads/BTFF15.jpg:
+    download: https://www.wow247.co.uk/wp-content/uploads/2015/09/back-to-the-future-poster.jpg
+    cleanup_level: purge
+ 
+  downloads/michael.png:
+    download: https://raw.githubusercontent.com/dfalster/baad/master/extra/baad.png
+    cleanup_level: purge
+
+  downloads/baad.rds:
+    download: https://github.com/dfalster/baad/releases/download/v1.0.0/baad.rds
+    cleanup_level: purge
+
+  baad:
+    command: readRDS("downloads/baad.rds")
+
+  figures/map.pdf:
+    command: figure_map(baad)
+    plot: 9by4
+
+  figures/baad_variable_count.pdf:
+    command: baad_variable_count(baad)
+    plot: square6
+
+  figures/tradeoff-Falster2015-1.pdf:
+    command: allometry_LH(baad, 1)
+    plot: square3
+    quiet: TRUE
+
+  figures/tradeoff-Falster2015-2.pdf:
+    command: allometry_LH(baad, 2)
+    plot: square3
+    quiet: TRUE
+
+  figures/tradeoff-Falster2015-3.pdf:
+    command: allometry_LH(baad, 3)
+    plot: square3
+    quiet: TRUE
