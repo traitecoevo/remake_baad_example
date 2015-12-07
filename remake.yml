@@ -25,18 +25,13 @@ targets:
 
   figures:
     depends:
-      - downloads/BTFF15.jpg
       - downloads/michael.png
       - figures/map.pdf
       - figures/baad_variable_count.pdf
       - figures/baad_leaf_height.pdf
 
-  downloads/BTFF15.jpg:
-    download: https://www.wow247.co.uk/wp-content/uploads/2015/09/back-to-the-future-poster.jpg
-    cleanup_level: purge
- 
   downloads/michael.png:
-    download: https://raw.githubusercontent.com/dfalster/baad/master/extra/baad.png
+    command: download_michael(target_name)
     cleanup_level: purge
 
   downloads/baad.rds:

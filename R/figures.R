@@ -2,8 +2,12 @@ download_baad <- function(destination_filename) {
   url <-
     "https://github.com/dfalster/baad/releases/download/v1.0.0/baad.rds"
   download(url, destination_filename, mode="wb")
-  # download function from package downloader provides wrapper
-  # to download file so that works for https and across platforms
+}
+
+download_michael <- function(destination_filename) {
+  url <-
+    "https://raw.githubusercontent.com/dfalster/baad/master/extra/baad.png"
+  download(url, destination_filename, mode="wb")
 }
 
 my_cols <- function() {
