@@ -29,11 +29,16 @@ baad_variable_count <- function(baad) {
   mtext("Number of records", 1, line=3, cex=1.0)
 }
 
-allometry_LH <- function(baad, option=1){
+allometry_LH <- function(baad){
 
   cols <- my_cols()
 
   data <- baad[["data"]]
+  data <- subset(data, !is.na(data[["a.lf"]]*data[["h.t"]]))
+
+  # remove species with < 3 data points
+  n <- table(data$species)
+  data <- subset(data, !data[["species"]] %in% names(n)[n<4])
 
   par(mar=c(5,5,1,1))
 
@@ -41,42 +46,19 @@ allometry_LH <- function(baad, option=1){
   H <- data[["h.t"]]
   G <- data[["species"]]
 
-  ii <- data$studyName == "Martin1998"
-
-  ax <- seq(-5, 3, by=2)
+  ax <- seq(-5, 4, by=2)
   lab <- do.call(expression, lapply(ax, function(i) bquote(10^.(i))))
 
-  ax2 <- seq(-5, 3)
-  lab2 <- do.call(expression, lapply(ax2, function(i) bquote(10^.(i))))
-
-  sm1 <- sma(H[ii] ~ A[ii] * G[ii], log = "xy")
-  sm2 <- sma(H ~ A * G, log = "xy")
+  smfit <- sma(H ~ A * G, log = "xy")
 
   blank_plot(xlim = c(1E-5, 5E3), ylim=c(0.001, 200), log = "xy")
   axis(1, at = 10^ax, labels = lab, las = 1, cex.axis = 0.8)
-  axis(2, at = 10^ax2, labels = lab2, las = 1, cex.axis = 0.8)
+  axis(2, at = 10^ax, labels = lab, las = 1, cex.axis = 0.8)
 
-  x <- c(1E-5, 5E3)
-  y <- 5.44*x^0.306
-
-  if(option==1){
-    plot(sm1, add = TRUE, col = cols["b_orange"], pch = 19, lwd = 0,
-    cex = 1, type = "p")
-    lines(x,y, col = cols["b_orange"], lwd = 1, lty="dashed")
-    plot(sm1, add = TRUE, col = cols["b_green"], lwd = 1, type = "l")
-    species <- G[!is.na(H * A) & ii]
-  } else if(option > 1){
-    plot(sm2, add = TRUE, col = cols["b_grey"], pch = 19, lwd = 0,
-    cex = 1, type = "p")
-    if(option==2){
-      plot(sm1, add = TRUE, col = cols["b_orange"], pch = 19, lwd = 0,
-        cex = 1, type = "p")
-      lines(x,y, col = cols["b_orange"], lwd = 1, lty="dashed")
-    } else {
-      plot(sm2, add = TRUE, col =cols["b_green"], lwd = 1, type = "l", p.lines.transparent =0.15)
-    }
-   species <- G[!is.na(H * A)]
-  }
+  plot(smfit, add = TRUE, col = cols["b_grey"], pch = 19, lwd = 0,
+  cex = 1, type = "p")
+  plot(smfit, add = TRUE, col =cols["b_green"], lwd = 1, type = "l", p.lines.transparent =0.15)
+  species <- G[!is.na(H * A)]
   mtext("Individual's height (m)", 2, line=3)
   mtext(expression("Individual's leaf area"~~(m^2)), 1, line=3)
   legend("topleft", legend = paste(length(species), " individuals\n", length(unique(species)), " species"), bty = "n", cex = 0.5)
@@ -108,7 +90,6 @@ figure_map <- function(baad){
   text(x=X, y=Y[3]+10, labels="plants", pos=4)
 
 }
-
 
 drawWorldPlot <- function(data, sizebyn=FALSE, add=FALSE,
                           pchcol="red", legend=TRUE) {
