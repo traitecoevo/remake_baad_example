@@ -3,6 +3,7 @@ packages:
   - smatr
   - maps
   - mapdata
+  - baad.data
 
 sources:
   - R
@@ -21,48 +22,21 @@ plot_options:
 targets:
   all:
     depends:
-      - figures
-      - tables
+      - output/report.html
+      - figures_stanadlone
+      - Rscript.R
 
-  figures:
-    depends:
-      - downloads/michael.png
-      - figures/map.pdf
-      - figures/baad_variable_count.pdf
-      - figures/baad_leaf_height.pdf
-
-  downloads/michael.png:
-    command: download_michael(target_name)
-    cleanup_level: purge
+# ------- data --------------------------
 
   downloads/baad.rds:
     command: download_baad(target_name)
     cleanup_level: purge
+    check: exists
 
   baad:
-    command: readRDS("downloads/baad.rds")
+    command: baad_data(I("1.0.0"))
 
-  figures/map.pdf:
-    command: figure_map(baad)
-    plot: 9by4
-
-  figures/baad_variable_count.pdf:
-    command: figure_variable_count(baad)
-    plot: square6
-
-  figures/baad_leaf_height.pdf:
-    command: figure_allometry_LH(baad)
-    plot: square3
-
-  tables:
-    depends:
-      - tables/summary.csv
-
-  summary:
-    command: table_summary(baad)
-
-  tables/summary.csv:
-    command: write.csv(summary, target_name, row.names=FALSE)
+# ------- knitr report -------------------
 
   report.md:
     packages: knitr
@@ -70,6 +44,42 @@ targets:
     depends:
       - baad
 
-  report.docx:
+  output/report.html:
     packages: rmarkdown
-    command: render("report.md", I("word_document"), quiet=TRUE)
+    command: render("report.md", I("html_document"), quiet=TRUE, output_dir = I("output"))
+
+# ------- Export copies of figures -------
+
+  figures_stanadlone:
+    depends:
+      - output/map.pdf
+      - output/fig_count.pdf
+      - output/fig_allometry.pdf
+      - output/summary.csv
+
+  output/map.pdf:
+    command: figure_map(baad)
+    plot: 9by4
+
+  output/fig_count.pdf:
+    command: figure_count(baad)
+    plot:
+      height: 6
+      width: 8
+
+  output/fig_allometry.pdf:
+    command: fig_allometry(baad)
+    plot: square3
+
+  summary:
+    command: table_summary(baad)
+
+  output/summary.csv:
+    command: write.csv(summary, target_name, row.names=FALSE)
+
+# ------- R script -------------------
+# generate a traditional R script (for those who don't like remake)
+
+  Rscript.R:
+    packages: remake
+    command: make_script(file=target_name, target_names=I(c("figures_stanadlone", "output/report.html")))

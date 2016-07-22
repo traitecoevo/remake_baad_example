@@ -30,14 +30,14 @@ kable(table_summary(baad), "markdown", align="l", padding=10)
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=7}
-figure_variable_count(baad)
+figure_count(baad)
 ```
 
 **Figure 2** Plot of most commonly recorded variables in BAAD.
 
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width=9, fig.height=7}
-figure_allometry_LH(baad)
+fig_allometry(baad)
 ```
 
 **Figure 3** Plot of leaf area vs height in BAAD.

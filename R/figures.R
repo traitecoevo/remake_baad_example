@@ -1,23 +1,11 @@
-download_baad <- function(destination_filename) {
-  url <-
-    "https://github.com/dfalster/baad/releases/download/v1.0.0/baad.rds"
-  download(url, destination_filename, mode="wb")
-}
-
-download_michael <- function(destination_filename) {
-  url <-
-    "https://raw.githubusercontent.com/dfalster/baad/master/extra/baad.png"
-  download(url, destination_filename, mode="wb")
-}
-
 my_cols <- function() {
   c(b_blue = "#6baed6", b_grey = "#969696", b_purple = "#9e9ac8", b_green = "#74c476",
     b_pink = "#e377c2", b_orange = "#FD8D3C", b_darkgrey = "#2D2D2D", b_white = "navajowhite4")
 }
 
-figure_variable_count <- function(baad) {
+figure_count <- function(baad) {
 
-  par(oma = c(0, 0, 0, 0), mar = c(4, 13, 0, 1.5))
+  par(oma = c(0, 1, 0, 0), mar = c(4, 13, 0, 1.5))
   cols <- my_cols()
 
   data <- baad[["data"]][, sapply(baad[["data"]], is.numeric) & !names(baad[["data"]]) %in%
@@ -32,7 +20,7 @@ figure_variable_count <- function(baad) {
   mtext("Number of records", 1, line = 3, cex = 1)
 }
 
-figure_allometry_LH <- function(baad) {
+fig_allometry <- function(baad) {
 
   cols <- my_cols()
 
