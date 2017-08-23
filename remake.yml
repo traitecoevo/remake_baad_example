@@ -4,6 +4,8 @@ packages:
   - maps
   - mapdata
   - baad.data
+  - datastorr
+  - DiagrammeR
 
 sources:
   - R
